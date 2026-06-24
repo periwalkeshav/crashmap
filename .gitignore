@@ -1,0 +1,24 @@
+# Data files (too large for GitHub)
+data/
+app/data/
+*.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+app/frontend/node_modules/
+app/frontend/build/
+
+# Misc
+.DS_Store
+*.log
