@@ -19,7 +19,7 @@ The dataset covers ~3 million accident records across 49 states from 2016 to 202
 - [x] Build a custom CSV parser that can handle multi-GB files efficiently
 - [x] Implement a DataFrame-like class from scratch for filtering and aggregation
 - [x] Expose data via a REST API (FastAPI)
-- [ ] Build an interactive heatmap + charts on the frontend
+- [x] Build an interactive heatmap + charts on the frontend
 - [ ] Correlate accidents with weather, time of day, and severity
 
 ## Project structure
@@ -28,9 +28,16 @@ crashmap/
 ├── app/
 │   ├── backend/
 │   │   ├── requirements.txt
-│   │   └── functions.py
+│   │   ├── functions.py
+│   │   └── main.py
 │   └── frontend/
-├── data/ (file not large to upload)
+│       ├── package.json
+│       └── src/
+│           ├── App.js
+│           ├── App.css
+│           └── components/
+│               └── HeatMap.js
+├── data/
 ├── images/
 └── README.md
 
@@ -48,7 +55,9 @@ data/
 
 ---
 
-## Setup & running the backend
+## Setup & running
+
+### Backend
 
 ```bash
 # install dependencies
@@ -62,12 +71,22 @@ uvicorn app.backend.main:app --reload
 
 Once running, the API is available at `http://localhost:8000`.
 
+### Frontend
+
+```bash
+cd app/frontend
+npm install
+npm start
+```
+
+Frontend runs at `http://localhost:3000`. Make sure the backend is running first.
+
 ---
 
 ## API endpoints
 
 | Method | Endpoint | Description |
-| -------- | ---------- | ------------- |
+|--------|----------|-------------|
 | GET | `/severity` | Accident count by severity level (1–4) |
 | GET | `/trends` | Yearly accident totals from 2016–2023 |
 | GET | `/heatmap` | City-level lat, lng, and accident count |
@@ -152,4 +171,27 @@ async def load_data():
 
 ---
 
-Work in progress. React frontend coming next.
+## Day 5 progress
+
+Started on the React frontend today. Bootstrapped the app with Create React App, installed `react-leaflet` and `leaflet.heat` for the heatmap layer.
+
+Two things done today:
+
+**Loading screen** — the backend takes 1–2 minutes to warm up, so the app polls a `/health` endpoint on startup and shows a spinner until the data is ready. Retries failed requests with a small delay instead of immediately crashing.
+
+**Heatmap component** — `HeatMap.js` fetches from `/heatmap`, converts the city-level lat/lng/count data into a Leaflet heatmap layer over a standard map tile. Severity filter is already wired up — changing it re-fetches and re-renders the layer.
+
+```jsx
+// HeatMap.js — simplified
+useEffect(() => {
+  fetch(`http://localhost:8000/heatmap?severity=${severity}`)
+    .then(res => res.json())
+    .then(data => setPoints(data));
+}, [severity]);
+```
+
+Dashboard layout is scaffolded — left filter panel, right chart area. Charts are placeholders for now.
+
+---
+
+Work in progress. Charts and filter controls coming next.
